@@ -2,10 +2,10 @@ from flask import Flask, render_template, request, redirect, session, send_file
 import sqlite3
 import pandas as pd
 from io import BytesIO
-import os  # Added to use PORT from environment
+import os
 
 app = Flask(__name__)
-app.secret_key = '72c7baeb30d86401bed44ff643471726'
+app.secret_key = '72c7baeb30d86401bed44ff643471726'  # Safe & portable key
 
 # Connect to database
 def get_db_connection():
@@ -13,22 +13,22 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
-# ✅ Initialize DB
+# ✅ Create tables if not exist
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
     CREATE TABLE IF NOT EXISTS users (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        username TEXT,
-        password TEXT
+        username TEXT NOT NULL,
+        password TEXT NOT NULL
     )
     """)
     cur.execute("""
     CREATE TABLE IF NOT EXISTS tasks (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
-        task TEXT,
-        user TEXT,
+        task TEXT NOT NULL,
+        user TEXT NOT NULL,
         status TEXT DEFAULT 'Pending'
     )
     """)
@@ -59,13 +59,11 @@ def register():
     if request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
-
         conn = get_db_connection()
         existing_user = conn.execute("SELECT * FROM users WHERE username = ?", (username,)).fetchone()
         if existing_user:
             conn.close()
             return "User already exists. <a href='/'>Login</a>"
-
         conn.execute("INSERT INTO users (username, password) VALUES (?, ?)", (username, password))
         conn.commit()
         conn.close()
@@ -140,14 +138,13 @@ def export():
     conn = get_db_connection()
     tasks = conn.execute('SELECT task, status FROM tasks WHERE user = ?', (session['user'],)).fetchall()
     conn.close()
-
     df = pd.DataFrame(tasks, columns=['Task', 'Status'])
     output = BytesIO()
     with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
         df.to_excel(writer, index=False, sheet_name='Tasks')
     output.seek(0)
-
-    return send_file(output, as_attachment=True, download_name='tasks.xlsx', mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    return send_file(output, as_attachment=True, download_name='tasks.xlsx',
+                     mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
 # Logout
 @app.route('/logout')
@@ -155,8 +152,8 @@ def logout():
     session.pop('user', None)
     return redirect('/')
 
-# ✅ Auto-init DB and run app
-if __name__ == "__main__":
-    init_db()  # Ensures tables exist before app starts
+# ✅ Start app with DB initialized
+if __name__ == '__main__':
+    init_db()
     port = int(os.environ.get("PORT", 10000))
-    app.run(host="0.0.0.0", port=port)
+    app.run(host='0.0.0.0', port=port)
