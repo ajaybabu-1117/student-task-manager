@@ -13,6 +13,28 @@ def get_db_connection():
     conn.row_factory = sqlite3.Row
     return conn
 
+# ✅ Initialize DB
+def init_db():
+    conn = get_db_connection()
+    cur = conn.cursor()
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT,
+        password TEXT
+    )
+    """)
+    cur.execute("""
+    CREATE TABLE IF NOT EXISTS tasks (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        task TEXT,
+        user TEXT,
+        status TEXT DEFAULT 'Pending'
+    )
+    """)
+    conn.commit()
+    conn.close()
+
 # Home/Login Page
 @app.route('/')
 def home():
@@ -133,7 +155,8 @@ def logout():
     session.pop('user', None)
     return redirect('/')
 
-# ✅ UPDATED: Use dynamic PORT and public HOST
+# ✅ Auto-init DB and run app
 if __name__ == "__main__":
+    init_db()  # Ensures tables exist before app starts
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
