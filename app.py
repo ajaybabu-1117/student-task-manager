@@ -7,33 +7,42 @@ import os
 app = Flask(__name__)
 app.secret_key = '72c7baeb30d86401bed44ff643471726'
 
+# PostgreSQL connection from Render
 DATABASE_URL = os.environ.get('DATABASE_URL')
 
 def get_db_connection():
-    conn = psycopg2.connect(DATABASE_URL, sslmode='require')
-    return conn
+    return psycopg2.connect(DATABASE_URL, sslmode='require')
 
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
     cur.execute("""
-    CREATE TABLE IF NOT EXISTS users (
-        id SERIAL PRIMARY KEY,
-        username TEXT NOT NULL,
-        password TEXT NOT NULL
-    )
+        CREATE TABLE IF NOT EXISTS users (
+            id SERIAL PRIMARY KEY,
+            username TEXT NOT NULL,
+            password TEXT NOT NULL
+        )
     """)
     cur.execute("""
-    CREATE TABLE IF NOT EXISTS tasks (
-        id SERIAL PRIMARY KEY,
-        task TEXT NOT NULL,
-        "user" TEXT NOT NULL,
-        status TEXT DEFAULT 'Pending'
-    )
+        CREATE TABLE IF NOT EXISTS tasks (
+            id SERIAL PRIMARY KEY,
+            task TEXT NOT NULL,
+            "user" TEXT NOT NULL,
+            status TEXT DEFAULT 'Pending'
+        )
     """)
     conn.commit()
     cur.close()
     conn.close()
+
+# Temporary setup route to initialize DB on Render
+@app.route('/setup-db')
+def setup_db():
+    try:
+        init_db()
+        return '✅ Tables created successfully!'
+    except Exception as e:
+        return f'❌ Error: {str(e)}'
 
 @app.route('/')
 def home():
@@ -165,6 +174,5 @@ def logout():
     return redirect('/')
 
 if __name__ == '__main__':
-    init_db()
     port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
