@@ -1,11 +1,9 @@
 Flask
 gunicorn
 psycopg2-binary
-SQLAlchemy
 pandas
 openpyxl
 XlsxWriter
-
 
 
 
