@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, session, send_file
 import sqlite3
 import pandas as pd
 from io import BytesIO
+import os  # Added to use PORT from environment
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key'
@@ -132,5 +133,7 @@ def logout():
     session.pop('user', None)
     return redirect('/')
 
-if __name__ == '__main__':
-    app.run(debug=True)
+# ✅ UPDATED: Use dynamic PORT and public HOST
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 10000))
+    app.run(host="0.0.0.0", port=port)
