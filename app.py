@@ -2,18 +2,16 @@ from flask import Flask, render_template, request, redirect, session, send_file
 import sqlite3
 import pandas as pd
 from io import BytesIO
-import os
+import os  # Added to use PORT from environment
 
 app = Flask(__name__)
-app.secret_key = '72c7baeb30d86401bed44ff643471726'  # Safe & portable key
+app.secret_key = '72c7baeb30d86401bed44ff643471726'
 
-# Connect to database
 def get_db_connection():
     conn = sqlite3.connect('database.db')
     conn.row_factory = sqlite3.Row
     return conn
 
-# ✅ Create tables if not exist
 def init_db():
     conn = get_db_connection()
     cur = conn.cursor()
@@ -35,12 +33,10 @@ def init_db():
     conn.commit()
     conn.close()
 
-# Home/Login Page
 @app.route('/')
 def home():
     return render_template('login.html')
 
-# Handle Login
 @app.route('/login', methods=['POST'])
 def login():
     username = request.form['username']
@@ -53,7 +49,6 @@ def login():
         return redirect('/dashboard')
     return 'Invalid credentials. <a href="/">Try again</a>'
 
-# Register Page
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     if request.method == 'POST':
@@ -70,7 +65,6 @@ def register():
         return redirect('/')
     return render_template('register.html')
 
-# Dashboard
 @app.route('/dashboard')
 def dashboard():
     if 'user' not in session:
@@ -80,7 +74,6 @@ def dashboard():
     conn.close()
     return render_template('dashboard.html', tasks=tasks)
 
-# Add Task
 @app.route('/add-task', methods=['POST'])
 def add_task():
     if 'user' not in session:
@@ -92,7 +85,6 @@ def add_task():
     conn.close()
     return redirect('/dashboard')
 
-# Mark task as done
 @app.route('/mark-done/<int:task_id>')
 def mark_done(task_id):
     if 'user' not in session:
@@ -103,7 +95,6 @@ def mark_done(task_id):
     conn.close()
     return redirect('/dashboard')
 
-# Delete task
 @app.route('/delete-task/<int:task_id>')
 def delete_task(task_id):
     if 'user' not in session:
@@ -114,7 +105,6 @@ def delete_task(task_id):
     conn.close()
     return redirect('/dashboard')
 
-# Edit Task
 @app.route('/edit-task/<int:task_id>', methods=['GET', 'POST'])
 def edit_task(task_id):
     if 'user' not in session:
@@ -130,7 +120,6 @@ def edit_task(task_id):
     conn.close()
     return render_template('edit_task.html', task=task)
 
-# Export to Excel
 @app.route('/export')
 def export():
     if 'user' not in session:
@@ -146,13 +135,12 @@ def export():
     return send_file(output, as_attachment=True, download_name='tasks.xlsx',
                      mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
 
-# Logout
 @app.route('/logout')
 def logout():
     session.pop('user', None)
     return redirect('/')
 
-# ✅ Start app with DB initialized
+# ✅ Final deployment-ready start
 if __name__ == '__main__':
     init_db()
     port = int(os.environ.get("PORT", 10000))
