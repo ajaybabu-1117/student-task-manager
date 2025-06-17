@@ -89,25 +89,27 @@
 
     <h4 class="mb-3 text-secondary">Your Tasks</h4>
     <ul class="list-group">
-      {% for task in tasks %}
-        <li class="list-group-item d-flex justify-content-between align-items-center">
-          <div>
-            {% if task['status'] == 'Done' %}
-              <span class="task-done">{{ task['task'] }}</span>
-            {% else %}
-              {{ task['task'] }}
-            {% endif %}
-          </div>
-          <div>
-            {% if task['status'] != 'Done' %}
-              <a href="/mark-done/{{ task['id'] }}" class="btn btn-sm btn-success me-2"><i class="bi bi-check-lg"></i></a>
-            {% endif %}
-            <a href="/delete-task/{{ task['id'] }}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
-          </div>
-        </li>
+      {% if tasks %}
+        {% for task in tasks %}
+          <li class="list-group-item d-flex justify-content-between align-items-center">
+            <div>
+              {% if task['status'] == 'Done' %}
+                <span class="task-done">{{ task['task'] }}</span>
+              {% else %}
+                {{ task['task'] }}
+              {% endif %}
+            </div>
+            <div>
+              {% if task['status'] != 'Done' %}
+                <a href="/mark-done/{{ task['id'] }}" class="btn btn-sm btn-success me-2"><i class="bi bi-check-lg"></i></a>
+              {% endif %}
+              <a href="/delete-task/{{ task['id'] }}" class="btn btn-sm btn-danger"><i class="bi bi-trash"></i></a>
+            </div>
+          </li>
+        {% endfor %}
       {% else %}
         <li class="list-group-item no-tasks">No tasks yet. Start by adding one above.</li>
-      {% endfor %}
+      {% endif %}
     </ul>
 
     <div class="text-center logout-btn">
