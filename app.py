@@ -5,7 +5,7 @@ from io import BytesIO
 import os  # Added to use PORT from environment
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+app.secret_key = '72c7baeb30d86401bed44ff643471726'
 
 # Connect to database
 def get_db_connection():
