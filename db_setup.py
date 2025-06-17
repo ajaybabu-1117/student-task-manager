@@ -13,12 +13,13 @@ CREATE TABLE IF NOT EXISTS users (
 )
 """)
 
-# create tasks table
+# create tasks table with status
 cur.execute("""
 CREATE TABLE IF NOT EXISTS tasks (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     task TEXT,
-    user TEXT
+    user TEXT,
+    status TEXT DEFAULT 'Pending'
 )
 """)
 
@@ -26,4 +27,4 @@ CREATE TABLE IF NOT EXISTS tasks (
 conn.commit()
 conn.close()
 
-print("✅ Done! Database created.")
+print("✅ Done! Database created with status column.")
