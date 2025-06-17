@@ -24,20 +24,20 @@
     }
 
     .login-container {
-      background: #fff;
+      background: #ffffff;
       padding: 40px 30px;
-      border-radius: 15px;
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
       width: 100%;
       max-width: 400px;
       text-align: center;
-      color: #333;
     }
 
     .login-container h2 {
-      margin-bottom: 20px;
+      margin-bottom: 25px;
       font-weight: 600;
       font-size: 28px;
+      color: #333;
     }
 
     .login-container input[type="text"],
@@ -49,11 +49,12 @@
       border-radius: 8px;
       outline: none;
       transition: 0.3s;
+      font-size: 15px;
     }
 
     .login-container input:focus {
       border-color: #2575fc;
-      box-shadow: 0 0 5px rgba(37, 117, 252, 0.5);
+      box-shadow: 0 0 6px rgba(37, 117, 252, 0.4);
     }
 
     .login-container button {
@@ -64,9 +65,9 @@
       border: none;
       border-radius: 8px;
       font-size: 16px;
-      margin-top: 10px;
+      margin-top: 12px;
       cursor: pointer;
-      transition: 0.3s;
+      transition: background 0.3s;
     }
 
     .login-container button:hover {
@@ -74,8 +75,9 @@
     }
 
     .login-container p {
-      margin-top: 15px;
+      margin-top: 18px;
       font-size: 14px;
+      color: #444;
     }
 
     .login-container a {
@@ -97,7 +99,7 @@
 </head>
 <body>
   <div class="login-container">
-    <h2>Welcome Back </h2>
+    <h2>Welcome Back 👋</h2>
     <form method="POST" action="/login">
       <input type="text" name="username" placeholder="Enter Username" required>
       <input type="password" name="password" placeholder="Enter Password" required>
